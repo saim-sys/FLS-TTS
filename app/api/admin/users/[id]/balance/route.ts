@@ -42,6 +42,12 @@ export async function PATCH(
 
     console.log(`✅ /api/admin/users/[id]/balance: Updating user ${userId} balance to ${balance}`)
 
+    // First, let's check the current user data
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId }
+    })
+    console.log(`🔍 Current user data:`, currentUser)
+
     // Update the user's balance in the local database
     const updatedUser = await prisma.user.update({
       where: { id: userId },
@@ -49,6 +55,12 @@ export async function PATCH(
     })
 
     console.log(`✅ /api/admin/users/[id]/balance: User balance updated in database to ${updatedUser.balance}`)
+    
+    // Verify the update worked
+    const verifyUser = await prisma.user.findUnique({
+      where: { id: userId }
+    })
+    console.log(`🔍 Verification - user data after update:`, verifyUser)
 
     return NextResponse.json({
       id: userId,
