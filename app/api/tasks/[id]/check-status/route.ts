@@ -65,11 +65,28 @@ export async function POST(
     const externalTask = await getTask(task.externalTaskId)
     console.log('✅ /api/tasks/[id]/check-status: External task data:', externalTask)
 
+    // Map external API status to our Prisma enum
+    let mappedStatus: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+    
+    switch (externalTask.status.toLowerCase()) {
+      case 'completed':
+        mappedStatus = 'COMPLETED'
+        break
+      case 'failed':
+        mappedStatus = 'FAILED'
+        break
+      case 'processing':
+        mappedStatus = 'PROCESSING'
+        break
+      default:
+        mappedStatus = 'PENDING'
+    }
+
     // Update our database with the latest status
     const updatedTask = await prisma.task.update({
       where: { id: task.id },
       data: {
-        status: externalTask.status.toUpperCase(),
+        status: mappedStatus,
         resultUrl: externalTask.resultUrl,
         subtitleUrl: externalTask.subtitleUrl,
       },
