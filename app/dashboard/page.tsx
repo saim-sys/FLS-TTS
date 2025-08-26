@@ -408,14 +408,14 @@ export default function Dashboard() {
                           {task.status === 'completed' && task.resultUrl && (
                             <>
                               <button
-                                onClick={() => window.open(task.resultUrl, '_blank')}
+                                onClick={() => window.open(`/api/proxy/audio?url=${encodeURIComponent(task.resultUrl)}`, '_blank')}
                                 className="p-2 text-blue-600 hover:bg-blue-50 rounded"
                                 title="Play audio"
                               >
                                 <Play className="w-4 h-4" />
                               </button>
                               <button
-                                onClick={() => window.open(task.resultUrl, '_blank')}
+                                onClick={() => window.open(`/api/proxy/audio?url=${encodeURIComponent(task.resultUrl)}`, '_blank')}
                                 className="p-2 text-green-600 hover:bg-green-50 rounded"
                                 title="Download audio"
                               >
