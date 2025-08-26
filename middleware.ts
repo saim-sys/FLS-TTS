@@ -6,20 +6,19 @@ export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   // Define public paths that don't require authentication
-  const isPublicPath = path === '/' || path === '/api/auth/login' || path === '/api/auth/register'
-
-  // Get the token from the request headers or cookies
-  const token = request.headers.get('authorization')?.replace('Bearer ', '') || 
-                request.cookies.get('token')?.value
+  const isPublicPath = path === '/' || 
+                      path === '/api/auth/login' || 
+                      path === '/api/auth/register' ||
+                      path === '/api/test' ||
+                      path === '/api/test-db' ||
+                      path === '/api/test-users' ||
+                      path === '/api/test-login' ||
+                      path === '/api/setup' ||
+                      path === '/api/setup-db'
 
   // If the path is public, allow access
   if (isPublicPath) {
     return NextResponse.next()
-  }
-
-  // If accessing dashboard without token, redirect to login
-  if (path.startsWith('/dashboard') && !token) {
-    return NextResponse.redirect(new URL('/', request.url))
   }
 
   // For API routes, let them handle authentication internally
@@ -27,6 +26,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // For all other routes (including dashboard), allow access
+  // Client-side code will handle authentication checks
   return NextResponse.next()
 }
 
