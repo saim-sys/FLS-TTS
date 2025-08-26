@@ -56,17 +56,11 @@ interface User {
   }>
 }
 
-// Voice interface
-interface Voice {
-  id: string
-  name: string
-  description?: string
-}
+
 
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null)
   const [tasks, setTasks] = useState<Task[]>([])
-  const [voices, setVoices] = useState<Voice[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const router = useRouter()
@@ -102,7 +96,6 @@ export default function Dashboard() {
     setUser(JSON.parse(userData))
     loadUserInfo()
     loadTasks()
-    loadVoices()
   }, [router])
 
   const loadUserInfo = async () => {
@@ -138,45 +131,7 @@ export default function Dashboard() {
     }
   }
 
-  const loadVoices = async () => {
-    try {
-      const token = localStorage.getItem('token')
-      const response = await fetch('/api/voices', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        setVoices(data.voices)
-      } else {
-        console.error('Failed to load voices, using fallback voices')
-        // Fallback voices with common voice IDs that might work
-        setVoices([
-          { id: '21m00Tcm4TlvDq8ikWAM', name: 'Rachel (Female, Professional)' },
-          { id: 'AZnzlk1XvdvUeBnXmlld', name: 'Domi (Female, Casual)' },
-          { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Bella (Female, Friendly)' },
-          { id: 'ErXwobaYiN019PkySvjV', name: 'Antoni (Male, Professional)' },
-          { id: 'MF3mGyEYCl7XYWbV9V6O', name: 'Elli (Female, Casual)' },
-          { id: 'VR6AewLTigWG4xSOukaG', name: 'Josh (Male, Authoritative)' },
-          { id: 'pNInz6obpgDQGcFmaJgB', name: 'Adam (Male, Friendly)' },
-          { id: 'yoZ06aMxZJJ28mfd3POQ', name: 'Sam (Male, Casual)' },
-        ])
-      }
-    } catch (error) {
-      console.error('Error loading voices:', error)
-      // Fallback voices with common voice IDs that might work
-      setVoices([
-        { id: '21m00Tcm4TlvDq8ikWAM', name: 'Rachel (Female, Professional)' },
-        { id: 'AZnzlk1XvdvUeBnXmlld', name: 'Domi (Female, Casual)' },
-        { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Bella (Female, Friendly)' },
-        { id: 'ErXwobaYiN019PkySvjV', name: 'Antoni (Male, Professional)' },
-        { id: 'MF3mGyEYCl7XYWbV9V6O', name: 'Elli (Female, Casual)' },
-        { id: 'VR6AewLTigWG4xSOukaG', name: 'Josh (Male, Authoritative)' },
-        { id: 'pNInz6obpgDQGcFmaJgB', name: 'Adam (Male, Friendly)' },
-        { id: 'yoZ06aMxZJJ28mfd3POQ', name: 'Sam (Male, Casual)' },
-      ])
-    }
-  }
+
 
   const onCreateTask = async (data: CreateTaskForm) => {
     setIsCreating(true)
@@ -306,19 +261,17 @@ export default function Dashboard() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Voice
+                    Voice ID
                   </label>
-                  <select
+                  <input
+                    type="text"
                     {...form.register('voiceId')}
                     className="input-field"
-                  >
-                    <option value="">Select a voice</option>
-                    {voices.map(voice => (
-                      <option key={voice.id} value={voice.id}>
-                        {voice.name}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder="Enter voice ID (e.g., 21m00Tcm4TlvDq8ikWAM)"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Enter the voice ID you want to use for text-to-speech generation
+                  </p>
                   {form.formState.errors.voiceId && (
                     <p className="text-red-500 text-sm mt-1">
                       {form.formState.errors.voiceId.message}
