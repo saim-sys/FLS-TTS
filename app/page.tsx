@@ -62,7 +62,15 @@ export default function Home() {
       
       console.log('🔄 Redirecting to dashboard...')
       setTimeout(() => {
-        router.push('/dashboard')
+        console.log('🔄 Executing router.push...')
+        try {
+          router.push('/dashboard')
+          console.log('✅ router.push executed successfully')
+        } catch (error) {
+          console.error('❌ router.push error:', error)
+          // Fallback redirect
+          window.location.href = '/dashboard'
+        }
       }, 1000)
       
     } catch (error) {
@@ -91,7 +99,12 @@ export default function Home() {
       localStorage.setItem('token', result.token)
       localStorage.setItem('user', JSON.stringify(result.user))
       toast.success('Registration successful!')
-      router.push('/dashboard')
+      try {
+        router.push('/dashboard')
+      } catch (error) {
+        console.error('❌ Registration router.push error:', error)
+        window.location.href = '/dashboard'
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Registration failed')
     } finally {
