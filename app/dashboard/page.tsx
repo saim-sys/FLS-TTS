@@ -63,6 +63,7 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
+  const [playingAudio, setPlayingAudio] = useState<string | null>(null)
   const router = useRouter()
 
   const form = useForm<CreateTaskForm>({
@@ -178,6 +179,28 @@ export default function Dashboard() {
     } catch (error) {
       toast.error('Failed to check task status')
     }
+  }
+
+  const onPlayAudio = (taskId: string, audioUrl: string) => {
+    setPlayingAudio(taskId)
+    
+    // Create audio element and play
+    const audio = new Audio(`/api/proxy/audio?url=${encodeURIComponent(audioUrl)}`)
+    
+    audio.addEventListener('ended', () => {
+      setPlayingAudio(null)
+    })
+    
+    audio.addEventListener('error', () => {
+      toast.error('Failed to play audio')
+      setPlayingAudio(null)
+    })
+    
+    audio.play().catch((error) => {
+      console.error('Audio play error:', error)
+      toast.error('Failed to play audio')
+      setPlayingAudio(null)
+    })
   }
 
   const onDeleteTask = async (taskId: string) => {
@@ -408,11 +431,16 @@ export default function Dashboard() {
                           {task.status === 'completed' && task.resultUrl && (
                             <>
                               <button
-                                onClick={() => window.open(`/api/proxy/audio?url=${encodeURIComponent(task.resultUrl!)}`, '_blank')}
+                                onClick={() => onPlayAudio(task.id, task.resultUrl!)}
                                 className="p-2 text-blue-600 hover:bg-blue-50 rounded"
                                 title="Play audio"
+                                disabled={playingAudio === task.id}
                               >
-                                <Play className="w-4 h-4" />
+                                {playingAudio === task.id ? (
+                                  <Loader className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Play className="w-4 h-4" />
+                                )}
                               </button>
                               <button
                                 onClick={() => window.open(`/api/proxy/audio?url=${encodeURIComponent(task.resultUrl!)}`, '_blank')}
