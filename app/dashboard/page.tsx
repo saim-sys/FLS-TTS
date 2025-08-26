@@ -84,14 +84,21 @@ export default function Dashboard() {
   })
 
   useEffect(() => {
+    console.log('🔍 Dashboard: Checking authentication...')
+    
     const token = localStorage.getItem('token')
     const userData = localStorage.getItem('user')
     
+    console.log('🔍 Dashboard: Token exists:', !!token)
+    console.log('🔍 Dashboard: User data exists:', !!userData)
+    
     if (!token || !userData) {
+      console.log('❌ Dashboard: Missing token or user data, redirecting to login')
       router.push('/')
       return
     }
 
+    console.log('✅ Dashboard: Authentication found, setting user...')
     setUser(JSON.parse(userData))
     loadUserInfo()
     loadTasks()
