@@ -16,7 +16,8 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Loader
+  Loader,
+  Settings
 } from 'lucide-react'
 import AudioPlayer from '../components/AudioPlayer'
 
