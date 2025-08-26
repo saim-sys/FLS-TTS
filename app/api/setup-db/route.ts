@@ -9,44 +9,43 @@ export async function GET(request: NextRequest) {
     await prisma.$connect()
     console.log('✅ Connected to database')
 
-    // This will create all tables based on the Prisma schema
-    // We'll do this by running a simple query that forces table creation
-    const result = await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS "users" (
-        "id" TEXT NOT NULL,
-        "email" TEXT NOT NULL,
-        "username" TEXT NOT NULL,
-        "password" TEXT NOT NULL,
-        "isActive" BOOLEAN NOT NULL DEFAULT true,
-        "isAdmin" BOOLEAN NOT NULL DEFAULT false,
-        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        "updatedAt" TIMESTAMP(3) NOT NULL,
-        CONSTRAINT "users_pkey" PRIMARY KEY ("id")
-      );
+    // Create users table
+    await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "users" (
+      "id" TEXT NOT NULL,
+      "email" TEXT NOT NULL,
+      "username" TEXT NOT NULL,
+      "password" TEXT NOT NULL,
+      "isActive" BOOLEAN NOT NULL DEFAULT true,
+      "isAdmin" BOOLEAN NOT NULL DEFAULT false,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL,
+      CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+    )`
 
-      CREATE TABLE IF NOT EXISTS "tasks" (
-        "id" TEXT NOT NULL,
-        "userId" TEXT NOT NULL,
-        "input" TEXT NOT NULL,
-        "voiceId" TEXT NOT NULL,
-        "modelId" TEXT NOT NULL,
-        "style" DOUBLE PRECISION,
-        "speed" DOUBLE PRECISION,
-        "useSpeakerBoost" BOOLEAN,
-        "similarity" DOUBLE PRECISION,
-        "stability" DOUBLE PRECISION,
-        "status" TEXT NOT NULL DEFAULT 'PENDING',
-        "resultUrl" TEXT,
-        "subtitleUrl" TEXT,
-        "externalTaskId" TEXT,
-        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        "updatedAt" TIMESTAMP(3) NOT NULL,
-        CONSTRAINT "tasks_pkey" PRIMARY KEY ("id")
-      );
+    // Create tasks table
+    await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "tasks" (
+      "id" TEXT NOT NULL,
+      "userId" TEXT NOT NULL,
+      "input" TEXT NOT NULL,
+      "voiceId" TEXT NOT NULL,
+      "modelId" TEXT NOT NULL,
+      "style" DOUBLE PRECISION,
+      "speed" DOUBLE PRECISION,
+      "useSpeakerBoost" BOOLEAN,
+      "similarity" DOUBLE PRECISION,
+      "stability" DOUBLE PRECISION,
+      "status" TEXT NOT NULL DEFAULT 'PENDING',
+      "resultUrl" TEXT,
+      "subtitleUrl" TEXT,
+      "externalTaskId" TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL,
+      CONSTRAINT "tasks_pkey" PRIMARY KEY ("id")
+    )`
 
-      CREATE UNIQUE INDEX IF NOT EXISTS "users_email_key" ON "users"("email");
-      CREATE UNIQUE INDEX IF NOT EXISTS "users_username_key" ON "users"("username");
-    `
+    // Create indexes
+    await prisma.$executeRaw`CREATE UNIQUE INDEX IF NOT EXISTS "users_email_key" ON "users"("email")`
+    await prisma.$executeRaw`CREATE UNIQUE INDEX IF NOT EXISTS "users_username_key" ON "users"("username")`
 
     console.log('✅ Database tables created successfully')
 
