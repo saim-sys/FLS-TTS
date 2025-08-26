@@ -18,6 +18,7 @@ import {
   XCircle,
   Loader
 } from 'lucide-react'
+import AudioPlayer from '@/components/AudioPlayer'
 
 const createTaskSchema = z.object({
   input: z.string().min(1, 'Text is required').max(5000, 'Text is too long'),
@@ -63,7 +64,10 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
-  const [playingAudio, setPlayingAudio] = useState<string | null>(null)
+  const [audioPlayer, setAudioPlayer] = useState<{ isOpen: boolean; audioUrl: string }>({
+    isOpen: false,
+    audioUrl: ''
+  })
   const router = useRouter()
 
   const form = useForm<CreateTaskForm>({
@@ -181,26 +185,15 @@ export default function Dashboard() {
     }
   }
 
-  const onPlayAudio = (taskId: string, audioUrl: string) => {
-    setPlayingAudio(taskId)
-    
-    // Create audio element and play
-    const audio = new Audio(`/api/proxy/audio?url=${encodeURIComponent(audioUrl)}`)
-    
-    audio.addEventListener('ended', () => {
-      setPlayingAudio(null)
+  const onPlayAudio = (audioUrl: string) => {
+    setAudioPlayer({
+      isOpen: true,
+      audioUrl: `/api/proxy/audio?url=${encodeURIComponent(audioUrl)}`
     })
-    
-    audio.addEventListener('error', () => {
-      toast.error('Failed to play audio')
-      setPlayingAudio(null)
-    })
-    
-    audio.play().catch((error) => {
-      console.error('Audio play error:', error)
-      toast.error('Failed to play audio')
-      setPlayingAudio(null)
-    })
+  }
+
+  const closeAudioPlayer = () => {
+    setAudioPlayer({ isOpen: false, audioUrl: '' })
   }
 
   const onDeleteTask = async (taskId: string) => {
@@ -431,16 +424,11 @@ export default function Dashboard() {
                           {task.status === 'completed' && task.resultUrl && (
                             <>
                               <button
-                                onClick={() => onPlayAudio(task.id, task.resultUrl!)}
+                                onClick={() => onPlayAudio(task.resultUrl!)}
                                 className="p-2 text-blue-600 hover:bg-blue-50 rounded"
                                 title="Play audio"
-                                disabled={playingAudio === task.id}
                               >
-                                {playingAudio === task.id ? (
-                                  <Loader className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <Play className="w-4 h-4" />
-                                )}
+                                <Play className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => window.open(`/api/proxy/audio?url=${encodeURIComponent(task.resultUrl!)}`, '_blank')}
@@ -477,6 +465,14 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      
+      {/* Audio Player Modal */}
+      {audioPlayer.isOpen && (
+        <AudioPlayer
+          audioUrl={audioPlayer.audioUrl}
+          onClose={closeAudioPlayer}
+        />
+      )}
     </div>
   )
 }
