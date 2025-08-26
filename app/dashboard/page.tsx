@@ -49,8 +49,8 @@ interface User {
   email: string
   username: string
   isAdmin: boolean
-  balance: number
-  credits: Array<{
+  balance?: number
+  credits?: Array<{
     amount: number
     expireAt: string
   }>
@@ -225,7 +225,7 @@ export default function Dashboard() {
             <div className="flex items-center space-x-4">
               <div className="text-right">
                 <p className="text-sm text-gray-600">Welcome, {user.username}</p>
-                <p className="text-xs text-gray-500">Balance: {user.balance.toLocaleString()}</p>
+                <p className="text-xs text-gray-500">Balance: {user.balance ? user.balance.toLocaleString() : 'Loading...'}</p>
               </div>
               <button
                 onClick={onLogout}

@@ -137,7 +137,12 @@ export async function getTaskHistory(page: number = 1, limit: number = 20): Prom
 
 export async function getUserInfo(): Promise<UserInfo> {
   try {
+    console.log('🔍 getUserInfo: Making request to external API...')
+    console.log('🔍 getUserInfo: Base URL:', EXTERNAL_API_BASE_URL)
+    console.log('🔍 getUserInfo: Token exists:', !!EXTERNAL_API_TOKEN)
+    
     const response = await externalApiClient.get('/api/me')
+    console.log('✅ getUserInfo: External API response:', response.data)
     
     // Transform external response to our internal format
     return {
@@ -150,7 +155,11 @@ export async function getUserInfo(): Promise<UserInfo> {
       })),
     }
   } catch (error) {
-    console.error('Error getting user info:', error)
+    console.error('❌ getUserInfo: Error:', error)
+    if (axios.isAxiosError(error)) {
+      console.error('❌ getUserInfo: Response status:', error.response?.status)
+      console.error('❌ getUserInfo: Response data:', error.response?.data)
+    }
     throw new Error('Failed to get user information')
   }
 }
