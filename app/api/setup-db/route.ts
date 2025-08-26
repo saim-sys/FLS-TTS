@@ -1,63 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { exec } from 'child_process'
+import { promisify } from 'util'
+
+const execAsync = promisify(exec)
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔄 Starting database setup...')
+    console.log('🔄 Starting database setup with Prisma...')
     
-    // Connect to database
-    await prisma.$connect()
-    console.log('✅ Connected to database')
+    // Use Prisma db push to create/update the database schema
+    console.log('🔍 Running: npx prisma db push')
+    const { stdout, stderr } = await execAsync('npx prisma db push --accept-data-loss')
+    
+    console.log('✅ Prisma db push output:', stdout)
+    if (stderr) {
+      console.log('⚠️ Prisma db push stderr:', stderr)
+    }
 
-    // Create users table
-    await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "users" (
-      "id" TEXT NOT NULL,
-      "email" TEXT NOT NULL,
-      "username" TEXT NOT NULL,
-      "password" TEXT NOT NULL,
-      "isActive" BOOLEAN NOT NULL DEFAULT true,
-      "isAdmin" BOOLEAN NOT NULL DEFAULT false,
-      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" TIMESTAMP(3) NOT NULL,
-      CONSTRAINT "users_pkey" PRIMARY KEY ("id")
-    )`
+    // Generate Prisma client
+    console.log('🔍 Running: npx prisma generate')
+    const { stdout: generateStdout, stderr: generateStderr } = await execAsync('npx prisma generate')
+    
+    console.log('✅ Prisma generate output:', generateStdout)
+    if (generateStderr) {
+      console.log('⚠️ Prisma generate stderr:', generateStderr)
+    }
 
-    // Create tasks table
-    await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "tasks" (
-      "id" TEXT NOT NULL,
-      "userId" TEXT NOT NULL,
-      "input" TEXT NOT NULL,
-      "voiceId" TEXT NOT NULL,
-      "modelId" TEXT NOT NULL,
-      "style" DOUBLE PRECISION,
-      "speed" DOUBLE PRECISION,
-      "useSpeakerBoost" BOOLEAN,
-      "similarity" DOUBLE PRECISION,
-      "stability" DOUBLE PRECISION,
-      "status" TEXT NOT NULL DEFAULT 'PENDING',
-      "resultUrl" TEXT,
-      "subtitleUrl" TEXT,
-      "externalTaskId" TEXT,
-      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" TIMESTAMP(3) NOT NULL,
-      CONSTRAINT "tasks_pkey" PRIMARY KEY ("id")
-    )`
-
-    // Create indexes
-    await prisma.$executeRaw`CREATE UNIQUE INDEX IF NOT EXISTS "users_email_key" ON "users"("email")`
-    await prisma.$executeRaw`CREATE UNIQUE INDEX IF NOT EXISTS "users_username_key" ON "users"("username")`
-
-    console.log('✅ Database tables created successfully')
-
-    // Test the tables by counting users
-    const userCount = await prisma.user.count()
-    console.log(`✅ User table working - found ${userCount} users`)
+    console.log('✅ Database setup completed successfully')
 
     return NextResponse.json({
       success: true,
-      message: 'Database setup completed successfully',
-      userCount,
-      tablesCreated: ['users', 'tasks']
+      message: 'Database setup completed successfully with Prisma',
+      prismaOutput: stdout,
+      generateOutput: generateStdout
     })
   } catch (error) {
     console.error('❌ Database setup error:', error)
@@ -66,7 +41,5 @@ export async function GET(request: NextRequest) {
       error: 'Database setup failed',
       details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
-  } finally {
-    await prisma.$disconnect()
   }
 }
