@@ -160,6 +160,26 @@ export default function Dashboard() {
     }
   }
 
+  const onCheckStatus = async (taskId: string) => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`/api/tasks/${taskId}/check-status`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        toast.success(`Task status updated: ${result.status}`)
+        loadTasks()
+      } else {
+        throw new Error('Failed to check task status')
+      }
+    } catch (error) {
+      toast.error('Failed to check task status')
+    }
+  }
+
   const onDeleteTask = async (taskId: string) => {
     if (!confirm('Are you sure you want to delete this task?')) return
 
@@ -402,6 +422,15 @@ export default function Dashboard() {
                                 <Download className="w-4 h-4" />
                               </button>
                             </>
+                          )}
+                          {task.status === 'pending' && (
+                            <button
+                              onClick={() => onCheckStatus(task.id)}
+                              className="p-2 text-orange-600 hover:bg-orange-50 rounded"
+                              title="Check status"
+                            >
+                              <Clock className="w-4 h-4" />
+                            </button>
                           )}
                           <button
                             onClick={() => onDeleteTask(task.id)}

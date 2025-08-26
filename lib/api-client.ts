@@ -72,6 +72,7 @@ export async function createTask(data: CreateTaskRequest): Promise<{ taskId: str
       use_speaker_boost: data.useSpeakerBoost || false,
       similarity: data.similarity || 0.75,
       stability: data.stability || 0.5,
+      call_back_url: `${process.env.NEXTAUTH_URL || 'https://fls-tts.vercel.app'}/api/webhook/callback`,
       export_subtitle: data.exportSubtitle || false,
       max_characters_per_line: data.maxCharactersPerLine || 42,
       max_lines_per_cue: data.maxLinesPerCue || 2,
