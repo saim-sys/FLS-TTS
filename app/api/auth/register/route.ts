@@ -11,6 +11,9 @@ const registerSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Ensure database connection
+    await prisma.$connect()
+    
     const body = await request.json()
     const { email, username, password } = registerSchema.parse(body)
 
@@ -58,9 +61,28 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Registration error:', error)
+    
+    // Check if it's a database connection error
+    if (error instanceof Error && error.message.includes('connect')) {
+      return NextResponse.json(
+        { error: 'Database connection failed. Please try again.' },
+        { status: 500 }
+      )
+    }
+    
+    // Check if it's a validation error
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid input data' },
+        { status: 400 }
+      )
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
+  } finally {
+    await prisma.$disconnect()
   }
 }
