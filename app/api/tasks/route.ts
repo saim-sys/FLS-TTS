@@ -21,8 +21,11 @@ const createTaskSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🔍 /api/tasks POST: Starting task creation...')
+    
     const authHeader = request.headers.get('authorization')
     if (!authHeader?.startsWith('Bearer ')) {
+      console.log('❌ /api/tasks POST: No valid authorization header')
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -30,21 +33,31 @@ export async function POST(request: NextRequest) {
     }
 
     const token = authHeader.substring(7)
+    console.log('🔍 /api/tasks POST: Token extracted, getting user...')
+    
     const user = await getUserFromToken(token)
     
     if (!user || !user.isActive) {
+      console.log('❌ /api/tasks POST: User not found or inactive')
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
+    console.log('✅ /api/tasks POST: User authenticated, parsing request body...')
     const body = await request.json()
+    console.log('📝 /api/tasks POST: Request body:', body)
+    
     const taskData = createTaskSchema.parse(body)
+    console.log('✅ /api/tasks POST: Request data validated')
 
+    console.log('🔍 /api/tasks POST: Creating task in external API...')
     // Create task in external API
     const externalTask = await createTask(taskData)
+    console.log('✅ /api/tasks POST: External task created:', externalTask)
 
+    console.log('🔍 /api/tasks POST: Storing task in database...')
     // Store task in our database
     const task = await prisma.task.create({
       data: {
@@ -61,6 +74,7 @@ export async function POST(request: NextRequest) {
         status: 'PENDING',
       },
     })
+    console.log('✅ /api/tasks POST: Task stored in database:', task.id)
 
     return NextResponse.json({
       id: task.id,
@@ -68,8 +82,9 @@ export async function POST(request: NextRequest) {
       status: 'pending',
     })
   } catch (error) {
-    console.error('Create task error:', error)
+    console.error('❌ /api/tasks POST: Error:', error)
     if (error instanceof z.ZodError) {
+      console.error('❌ /api/tasks POST: Validation error:', error.errors)
       return NextResponse.json(
         { error: 'Invalid request data' },
         { status: 400 }

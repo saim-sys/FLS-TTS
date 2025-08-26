@@ -53,6 +53,9 @@ export interface UserInfo {
 // Proxy functions that transform requests/responses
 export async function createTask(data: CreateTaskRequest): Promise<{ taskId: string }> {
   try {
+    console.log('🔍 createTask: Starting task creation...')
+    console.log('🔍 createTask: Input data:', data)
+    
     // Transform our internal format to external API format
     const externalRequest = {
       input: data.input,
@@ -68,15 +71,23 @@ export async function createTask(data: CreateTaskRequest): Promise<{ taskId: str
       max_lines_per_cue: data.maxLinesPerCue || 2,
       max_seconds_per_cue: data.maxSecondsPerCue || 7,
     }
+    
+    console.log('🔍 createTask: External request payload:', externalRequest)
+    console.log('🔍 createTask: Making request to external API...')
 
     const response = await externalApiClient.post('/api/elevenlabs/task', externalRequest)
+    console.log('✅ createTask: External API response:', response.data)
     
     // Transform external response to our internal format
     return {
       taskId: response.data.task_id
     }
   } catch (error) {
-    console.error('Error creating task:', error)
+    console.error('❌ createTask: Error:', error)
+    if (axios.isAxiosError(error)) {
+      console.error('❌ createTask: Response status:', error.response?.status)
+      console.error('❌ createTask: Response data:', error.response?.data)
+    }
     throw new Error('Failed to create voice generation task')
   }
 }
