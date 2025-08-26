@@ -150,22 +150,30 @@ export default function Dashboard() {
         setVoices(data.voices)
       } else {
         console.error('Failed to load voices, using fallback voices')
-        // Fallback voices if API fails
+        // Fallback voices with common voice IDs that might work
         setVoices([
-          { id: 'voice-1', name: 'Sarah (Female, Professional)' },
-          { id: 'voice-2', name: 'Michael (Male, Friendly)' },
-          { id: 'voice-3', name: 'Emma (Female, Casual)' },
-          { id: 'voice-4', name: 'David (Male, Authoritative)' },
+          { id: '21m00Tcm4TlvDq8ikWAM', name: 'Rachel (Female, Professional)' },
+          { id: 'AZnzlk1XvdvUeBnXmlld', name: 'Domi (Female, Casual)' },
+          { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Bella (Female, Friendly)' },
+          { id: 'ErXwobaYiN019PkySvjV', name: 'Antoni (Male, Professional)' },
+          { id: 'MF3mGyEYCl7XYWbV9V6O', name: 'Elli (Female, Casual)' },
+          { id: 'VR6AewLTigWG4xSOukaG', name: 'Josh (Male, Authoritative)' },
+          { id: 'pNInz6obpgDQGcFmaJgB', name: 'Adam (Male, Friendly)' },
+          { id: 'yoZ06aMxZJJ28mfd3POQ', name: 'Sam (Male, Casual)' },
         ])
       }
     } catch (error) {
       console.error('Error loading voices:', error)
-      // Fallback voices if API fails
+      // Fallback voices with common voice IDs that might work
       setVoices([
-        { id: 'voice-1', name: 'Sarah (Female, Professional)' },
-        { id: 'voice-2', name: 'Michael (Male, Friendly)' },
-        { id: 'voice-3', name: 'Emma (Female, Casual)' },
-        { id: 'voice-4', name: 'David (Male, Authoritative)' },
+        { id: '21m00Tcm4TlvDq8ikWAM', name: 'Rachel (Female, Professional)' },
+        { id: 'AZnzlk1XvdvUeBnXmlld', name: 'Domi (Female, Casual)' },
+        { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Bella (Female, Friendly)' },
+        { id: 'ErXwobaYiN019PkySvjV', name: 'Antoni (Male, Professional)' },
+        { id: 'MF3mGyEYCl7XYWbV9V6O', name: 'Elli (Female, Casual)' },
+        { id: 'VR6AewLTigWG4xSOukaG', name: 'Josh (Male, Authoritative)' },
+        { id: 'pNInz6obpgDQGcFmaJgB', name: 'Adam (Male, Friendly)' },
+        { id: 'yoZ06aMxZJJ28mfd3POQ', name: 'Sam (Male, Casual)' },
       ])
     }
   }
