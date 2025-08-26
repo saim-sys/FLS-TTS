@@ -38,6 +38,8 @@ export default function Home() {
   const onLogin = async (data: LoginForm) => {
     setIsLoading(true)
     try {
+      console.log('🔄 Attempting login...')
+      
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -45,16 +47,26 @@ export default function Home() {
       })
 
       const result = await response.json()
+      console.log('📡 Login response:', result)
 
       if (!response.ok) {
         throw new Error(result.error || 'Login failed')
       }
 
+      console.log('✅ Login successful, saving to localStorage...')
       localStorage.setItem('token', result.token)
       localStorage.setItem('user', JSON.stringify(result.user))
+      
+      console.log('✅ Showing success toast...')
       toast.success('Login successful!')
-      router.push('/dashboard')
+      
+      console.log('🔄 Redirecting to dashboard...')
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 1000)
+      
     } catch (error) {
+      console.error('❌ Login error:', error)
       toast.error(error instanceof Error ? error.message : 'Login failed')
     } finally {
       setIsLoading(false)
