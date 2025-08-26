@@ -28,6 +28,18 @@ export async function GET(request: NextRequest) {
 
     console.log('✅ Database setup completed successfully')
 
+    // Also try to add balance column directly if it doesn't exist
+    try {
+      console.log('🔍 Adding balance column if it doesn\'t exist...')
+      const { stdout: sqlStdout, stderr: sqlStderr } = await execAsync('npx prisma db execute --stdin <<< "ALTER TABLE users ADD COLUMN IF NOT EXISTS balance INTEGER DEFAULT 0;"')
+      console.log('✅ Balance column SQL output:', sqlStdout)
+      if (sqlStderr) {
+        console.log('⚠️ Balance column SQL stderr:', sqlStderr)
+      }
+    } catch (sqlError) {
+      console.log('⚠️ Balance column SQL error (non-critical):', sqlError)
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Database setup completed successfully with Prisma',
