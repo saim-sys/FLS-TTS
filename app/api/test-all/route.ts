@@ -11,12 +11,12 @@ export async function GET(request: NextRequest) {
     },
     database: {
       connected: false,
-      error: null,
+      error: null as string | null,
       userCount: 0,
     },
     externalApi: {
       reachable: false,
-      error: null,
+      error: null as string | null,
     }
   }
 
