@@ -42,16 +42,18 @@ export async function PATCH(
 
     console.log(`✅ /api/admin/users/[id]/balance: Updating user ${userId} balance to ${balance}`)
 
-    // Note: This would typically update the external API balance
-    // For now, we'll just return success since we don't have direct balance management
-    // You would need to integrate with your external API's balance management
+    // Update the user's balance in the local database
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { balance: balance }
+    })
 
-    console.log('✅ /api/admin/users/[id]/balance: Balance update request processed')
+    console.log(`✅ /api/admin/users/[id]/balance: User balance updated in database to ${updatedUser.balance}`)
 
     return NextResponse.json({
       id: userId,
-      balance: balance,
-      message: 'Balance update request processed. Please update the external API manually.'
+      balance: updatedUser.balance,
+      message: 'Balance updated successfully in local database. Note: External API balance may need separate management.'
     })
   } catch (error) {
     console.error('❌ /api/admin/users/[id]/balance: Error:', error)
