@@ -18,7 +18,7 @@ import {
   XCircle,
   Loader
 } from 'lucide-react'
-import AudioPlayer from '@/components/AudioPlayer'
+import AudioPlayer from '../components/AudioPlayer'
 
 const createTaskSchema = z.object({
   input: z.string().min(1, 'Text is required').max(5000, 'Text is too long'),
