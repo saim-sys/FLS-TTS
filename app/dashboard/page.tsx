@@ -148,9 +148,25 @@ export default function Dashboard() {
       if (response.ok) {
         const data = await response.json()
         setVoices(data.voices)
+      } else {
+        console.error('Failed to load voices, using fallback voices')
+        // Fallback voices if API fails
+        setVoices([
+          { id: 'voice-1', name: 'Sarah (Female, Professional)' },
+          { id: 'voice-2', name: 'Michael (Male, Friendly)' },
+          { id: 'voice-3', name: 'Emma (Female, Casual)' },
+          { id: 'voice-4', name: 'David (Male, Authoritative)' },
+        ])
       }
     } catch (error) {
       console.error('Error loading voices:', error)
+      // Fallback voices if API fails
+      setVoices([
+        { id: 'voice-1', name: 'Sarah (Female, Professional)' },
+        { id: 'voice-2', name: 'Michael (Male, Friendly)' },
+        { id: 'voice-3', name: 'Emma (Female, Casual)' },
+        { id: 'voice-4', name: 'David (Male, Authoritative)' },
+      ])
     }
   }
 
