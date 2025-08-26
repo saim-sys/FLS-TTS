@@ -81,6 +81,7 @@ export default function AdminDashboard() {
 
   const loadAdminData = async () => {
     try {
+      console.log('🔄 loadAdminData called...')
       const token = localStorage.getItem('token')
       
       // Load all users
@@ -90,7 +91,10 @@ export default function AdminDashboard() {
       
       if (usersResponse.ok) {
         const usersData = await usersResponse.json()
+        console.log('📡 Users data loaded:', usersData.users)
         setUsers(usersData.users)
+      } else {
+        console.error('❌ Failed to load users:', usersResponse.status)
       }
 
       // Load all tasks
@@ -145,7 +149,11 @@ export default function AdminDashboard() {
 
   const updateUserBalance = async (userId: string, balance: number) => {
     try {
+      console.log('🔄 updateUserBalance called with:', { userId, balance })
+      
       const token = localStorage.getItem('token')
+      console.log('🔍 Token exists:', !!token)
+      
       const response = await fetch(`/api/admin/users/${userId}/balance`, {
         method: 'PATCH',
         headers: {
@@ -155,13 +163,21 @@ export default function AdminDashboard() {
         body: JSON.stringify({ balance }),
       })
 
+      console.log('📡 Response status:', response.status)
+      const result = await response.json()
+      console.log('📡 Response data:', result)
+
       if (response.ok) {
+        console.log('✅ Balance update successful, reloading data...')
         toast.success('Balance updated successfully')
-        loadAdminData()
+        await loadAdminData()
+        console.log('✅ Admin data reloaded')
       } else {
-        throw new Error('Failed to update balance')
+        console.error('❌ Balance update failed:', result)
+        throw new Error(result.error || 'Failed to update balance')
       }
     } catch (error) {
+      console.error('❌ Balance update error:', error)
       toast.error('Failed to update balance')
     }
   }
