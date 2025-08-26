@@ -50,6 +50,12 @@ export interface UserInfo {
   }>
 }
 
+export interface Voice {
+  id: string
+  name: string
+  description?: string
+}
+
 // Proxy functions that transform requests/responses
 export async function createTask(data: CreateTaskRequest): Promise<{ taskId: string }> {
   try {
@@ -172,6 +178,28 @@ export async function getUserInfo(): Promise<UserInfo> {
       console.error('❌ getUserInfo: Response data:', error.response?.data)
     }
     throw new Error('Failed to get user information')
+  }
+}
+
+export async function getVoices(): Promise<Voice[]> {
+  try {
+    console.log('🔍 getVoices: Fetching available voices...')
+    const response = await externalApiClient.get('/api/elevenlabs/voices')
+    console.log('✅ getVoices: External API response:', response.data)
+    
+    // Transform external response to our internal format
+    return response.data.voices.map((voice: any) => ({
+      id: voice.id,
+      name: voice.name,
+      description: voice.description,
+    }))
+  } catch (error) {
+    console.error('❌ getVoices: Error:', error)
+    if (axios.isAxiosError(error)) {
+      console.error('❌ getVoices: Response status:', error.response?.status)
+      console.error('❌ getVoices: Response data:', error.response?.data)
+    }
+    throw new Error('Failed to get available voices')
   }
 }
 

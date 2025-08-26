@@ -56,17 +56,17 @@ interface User {
   }>
 }
 
-// Mock voice options - you can replace these with actual voices from your API
-const VOICE_OPTIONS = [
-  { id: 'voice-1', name: 'Sarah (Female, Professional)' },
-  { id: 'voice-2', name: 'Michael (Male, Friendly)' },
-  { id: 'voice-3', name: 'Emma (Female, Casual)' },
-  { id: 'voice-4', name: 'David (Male, Authoritative)' },
-]
+// Voice interface
+interface Voice {
+  id: string
+  name: string
+  description?: string
+}
 
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null)
   const [tasks, setTasks] = useState<Task[]>([])
+  const [voices, setVoices] = useState<Voice[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const router = useRouter()
@@ -102,6 +102,7 @@ export default function Dashboard() {
     setUser(JSON.parse(userData))
     loadUserInfo()
     loadTasks()
+    loadVoices()
   }, [router])
 
   const loadUserInfo = async () => {
@@ -134,6 +135,22 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error('Error loading tasks:', error)
+    }
+  }
+
+  const loadVoices = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch('/api/voices', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setVoices(data.voices)
+      }
+    } catch (error) {
+      console.error('Error loading voices:', error)
     }
   }
 
@@ -272,7 +289,7 @@ export default function Dashboard() {
                     className="input-field"
                   >
                     <option value="">Select a voice</option>
-                    {VOICE_OPTIONS.map(voice => (
+                    {voices.map(voice => (
                       <option key={voice.id} value={voice.id}>
                         {voice.name}
                       </option>
