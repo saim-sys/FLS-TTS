@@ -259,6 +259,15 @@ export default function Dashboard() {
                 <p className="text-sm text-gray-600">Welcome, {user.username}</p>
                 <p className="text-xs text-gray-500">Balance: {user.balance ? user.balance.toLocaleString() : 'Loading...'}</p>
               </div>
+              {user.isAdmin && (
+                <button
+                  onClick={() => router.push('/admin')}
+                  className="flex items-center text-blue-600 hover:text-blue-900"
+                >
+                  <Settings className="w-4 h-4 mr-1" />
+                  Admin
+                </button>
+              )}
               <button
                 onClick={onLogout}
                 className="flex items-center text-gray-600 hover:text-gray-900"
